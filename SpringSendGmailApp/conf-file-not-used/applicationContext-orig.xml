@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+ Copyright 2009: Thomson Reuters Global Resources.
+ All Rights Reserved. Proprietary and Confidential information of TRGR.
+ Disclosure, Use or Reproduction without the written authorization of TRGR is prohibited.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:aop="http://www.springframework.org/schema/aop"
+         xmlns:tx="http://www.springframework.org/schema/tx"
+         xmlns:context="http://www.springframework.org/schema/context"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+		   http://www.springframework.org/schema/context 
+		   http://www.springframework.org/schema/context/spring-context.xsd">
+    
+	<!-- the parent application context definition for the dashboard application -->
+	
+	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+	<!-- (in this case, JDBC-related settings for the dataSource definition below        -->
+	<!-- and email-related settings for the notification system.) -->
+    <bean id="propertyConfigurer" 
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+<!--                 <value>classpath:jdbc.properties</value> -->
+                <value>classpath:notification.properties</value>
+<!--                 <value>classpath:common.properties</value> -->
+            </list>
+        </property>
+    </bean>
+	<!-- Alternate location and mechanism:
+	<context:property-placeholder location="WEB-INF/jdbc.properties,WEB-INF/mail.properties"/>
+	-->
+
+<!--     <bean id="metricRuleManager"  -->
+<!-- 			class="com.trgr.cobalt.dw.dashboard.service.SimpleMetricRuleManager" -->
+<!-- 			destroy-method="destroy"> -->
+<!--         <property name="metricRuleDao" ref="metricRuleDao"/> -->
+<!-- 		<property name="metricResultDao" ref="metricResultDao"/> -->
+<!-- 		<property name="dmVersionDao" ref="dmVersionDao"/> -->
+<!-- 		<property name="metricCategoryDao" ref="metricCategoryDao"/> -->
+<!-- 		<property name="metricRuleBatchDao" ref="metricRuleBatchDao"/> -->
+<!-- 		<property name="mailManager" ref="emailManager" /> -->
+		<!-- Test/Production --> 
+<!-- 		<property name="envDescription" value="${app.env}" /> -->
+<!--     </bean> -->
+    
+<!--     <bean id="objectMetricManager"  -->
+<!-- 			class="com.trgr.cobalt.dw.dashboard.service.SimpleObjectGenerationMetricsManager"> -->
+<!-- 		<property name="objectMetricDao" ref="objectMetricDao"/> -->
+<!--     </bean> -->
+    
+<!--     <bean id="serverStatusManager"  -->
+<!-- 			class="com.trgr.cobalt.dw.dashboard.service.ServerStatusManager"> -->
+<!-- 		<property name="serverStatusDao" ref="serverStatusDao"/> -->
+<!--     </bean> -->
+    
+<!--     <bean id="workflowControlManager"  -->
+<!-- 			class="com.trgr.cobalt.dw.dashboard.service.SimpleWorkflowControlManager"> -->
+<!-- 		<property name="workflowControlDao" ref="workflowControlDao"/> -->
+<!--     </bean> -->
+    
+<!--     <bean id="publishingDMManager"  -->
+<!-- 			class="com.trgr.cobalt.dw.dashboard.service.SimplePublishingDMManager"> -->
+<!-- 		<property name="publishingDMDao" ref="publishingDMDao"/> -->
+<!--     </bean> -->
+	
+	<!-- Manages a local directory of files --> 
+<!-- 	<bean id="fileManager"  -->
+<!-- 		class="com.trgr.cobalt.dw.dashboard.service.SimpleFileManager" -->
+<!-- 		destroy-method="destroy"> -->
+        
+<!-- 			Location of the generated files for images etc. -->
+<!-- 			Note that relative paths should resolve to a directory -->
+<!-- 			within the server installation area. -->
+<!-- 		 --> 
+<!--         <property name="baseDirectory" value="${file.handler.directory}"/> -->
+		<!-- Maximum number of temporary files, will delete old temp files when max is reached --> 
+<!--         <property name="maxFilesInQueue" value="20"/> -->
+<!-- 	</bean> -->
+	
+	<!-- Local email relayer implementation -->
+	<bean id="emailerImpl" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mail.host}" />
+		<!-- The following two properties are required if an authenticated mail session is required -->
+		<property name="username" value="${mail.username}"/>
+		<property name="password" value="${mail.password}"/>
+	</bean>
+	<bean id="emailManager" class="test.runs.SimpleMailManager">
+		<property name="sender" ref="emailerImpl"/>
+		<property name="senderAddress" value="${mail.from}"/>
+		<property name="notificationGroup" value="${mail.to}"/>
+	</bean>
+	
+	<!-- Graphic renderer -->
+<!-- 	<bean id="graphicsHandler" class="com.trgr.cobalt.dw.dashboard.service.JFreeChartHandler"> -->
+<!--         <property name="defaultImageWidth" value="700"/> -->
+<!--         <property name="defaultImageHeight" value="350"/> -->
+<!-- 	</bean> -->
+	
+	<!-- Runs the Batch of rules (scheduled by Quartz via schedulingContext-quartz.xml) --> 
+<!-- 	<bean id="runRulesBean" class="com.trgr.cobalt.dw.dashboard.service.RuleBatchTask"> -->
+<!-- 		<property name="ruleManager" ref="metricRuleManager"/> -->
+<!-- 	</bean> -->
+	
+<!-- 	<bean id="metricResultManager" class="com.trgr.cobalt.dw.dashboard.service.SimpleMetricResultManager"> -->
+<!-- 		<property name="metricResultDao" ref="metricResultDao"/> -->
+<!-- 	</bean> -->
+	
+<!-- 	<bean id="metricResultDao" class="com.trgr.cobalt.dw.dashboard.repository.JdbcMetricResultDao"> -->
+<!-- 		<property name="dataSource" ref="dataSource" /> -->
+<!-- 		<property name="pkSource" ref="metricResultSeq" /> -->
+<!-- 	</bean> -->
+	
+<!-- 	<bean id="serverStatusDao" class="com.trgr.cobalt.dw.dashboard.repository.ServerStatusDao"> -->
+<!-- 		<property name="fileName" value="../webapps/Dashboard-${app.env}/file/serverlist.xml"/> -->
+<!-- 	</bean> -->
+	
+<!--     <bean id="metricRuleDao" class="com.trgr.cobalt.dw.dashboard.repository.JdbcMetricRuleDao"> -->
+<!--         <property name="dataSource" ref="dataSource"/> -->
+<!-- 		<property name="pkSource" ref="metricRuleSeq" /> -->
+<!--     </bean> -->
+
+<!-- 	<bean id="dmVersionDao" class="com.trgr.cobalt.dw.dashboard.repository.JdbcDmVersionDao"> -->
+<!-- 		<property name="dataSource" ref="dataSource"/> -->
+<!-- 	</bean> -->
+<!-- 	<bean id="metricCategoryDao" class="com.trgr.cobalt.dw.dashboard.repository.JdbcMetricCategoryDao"> -->
+<!-- 		<property name="dataSource" ref="dataSource"/> -->
+<!-- 	</bean>	 -->
+<!-- 	<bean id="metricRuleBatchDao" class="com.trgr.cobalt.dw.dashboard.repository.JdbcMetricRuleBatchDao"> -->
+<!-- 		<property name="dataSource" ref="dataSource" /> -->
+<!-- 		<property name="pkSource" ref="metricRuleBatchSeq" /> -->
+<!-- 	</bean> -->
+<!-- 	<bean id="objectMetricDao" class="com.trgr.cobalt.dw.dashboard.repository.JdbcObjectGenerationMetricDao"> -->
+<!-- 		<property name="dataSource" ref="dataSource"/> -->
+<!-- 	</bean> -->
+<!-- 	<bean id="workflowControlDao" class="com.trgr.cobalt.dw.dashboard.repository.JdbcWorkflowControlDao"> -->
+<!-- 		<property name="dataSource" ref="dataSource"/> -->
+<!-- 	</bean>	 -->
+<!-- 	<bean id="publishingDMDao" class="com.trgr.cobalt.dw.dashboard.repository.JdbcPublishingDMDao"> -->
+<!-- 		<property name="dataSource" ref="publishingDMSource"/> -->
+<!-- 	</bean>	 -->
+	
+
+<!-- 		Database sequence generators for PK assignment -->
+<!-- 		Note that the sequence classes are different for each DB vendor  -->
+
+<!-- 	<bean id="metricResultSeq" class="${jdbc.seq.impl.class}"> -->
+<!-- 		<property name="dataSource" ref="dataSource" /> -->
+<!-- 		<property name="incrementerName" value="COBALT_DASHBOARD.METRIC_RESULT_SEQ" /> -->
+<!-- 	</bean>	 -->
+<!-- 	<bean id="metricRuleSeq" class="${jdbc.seq.impl.class}"> -->
+<!-- 		<property name="dataSource" ref="dataSource" /> -->
+<!-- 		<property name="incrementerName" value="COBALT_DASHBOARD.METRIC_RULE_SEQ" /> -->
+<!-- 	</bean>	 -->
+<!-- 	<bean id="metricRuleBatchSeq" class="${jdbc.seq.impl.class}"> -->
+<!-- 		<property name="dataSource" ref="dataSource" /> -->
+<!-- 		<property name="incrementerName" value="COBALT_DASHBOARD.METRIC_RULE_BATCH_SEQ" /> -->
+<!-- 	</bean> -->
+	
+	<!-- see the following for URL to load-balanced RAC cluster  -->
+<!-- 		http://www.orafaq.com/forum/t/42889/0/ -->
+
+<!--     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"> -->
+<!--         <property name="driverClassName" value="${jdbc.driverClassName}"/> -->
+<!--         <property name="url" value="${jdbc.url}"/> -->
+<!--         <property name="username" value="${jdbc.username}"/> -->
+<!--         <property name="password" value="${jdbc.password}"/> -->
+<!--     </bean> -->
+    
+<!--     <bean id="publishingDMSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"> -->
+<!--         <property name="driverClassName" value="${jdbc.driverClassName}"/> -->
+<!--         <property name="url" value="${jdbc.publishdm.url}"/> -->
+<!--         <property name="username" value="${jdbc.publishdm.username}"/> -->
+<!--         <property name="password" value="${jdbc.publishdm.password}"/> -->
+<!--     </bean> -->
+    
+<!--     <bean id="transactionManager"  -->
+<!--           class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> -->
+<!--         <property name="dataSource" ref="dataSource"/> -->
+<!--     </bean> -->
+
+	<!-- Apply the transaction handling to the Manager classes --> 
+<!--     <aop:config> -->
+<!--         <aop:advisor pointcut="execution(* *..RuleManager.*(..))" advice-ref="txAdvice"/> -->
+<!--         <aop:advisor pointcut="execution(* *..MetricResultManager.*(..))" advice-ref="txAdvice"/> -->
+<!--         <aop:advisor pointcut="execution(* *..ObjectGenerationMetricsManager.*(..))" advice-ref="txAdvice"/> -->
+<!--         <aop:advisor pointcut="execution(* *..PublishingDMManager.*(..))" advice-ref="txAdvice"/> -->
+<!--         <aop:advisor pointcut="execution(* *..WorkflowControlManager.*(..))" advice-ref="txAdvice"/> -->
+<!--     </aop:config> -->
+
+	<!-- Save and Update methods should be commitable, others readonly (rollback) -->
+<!--     <tx:advice id="txAdvice"> -->
+<!--         <tx:attributes> -->
+<!--             <tx:method name="save*"/> -->
+<!-- 			<tx:method name="update*"/> -->
+<!--             <tx:method name="*" read-only="true"/> -->
+<!--         </tx:attributes> -->
+<!--     </tx:advice> -->
+</beans>

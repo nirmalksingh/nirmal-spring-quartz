@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+  - Scheduler context for Quartz. Schedules "list images" and "check images" jobs.
+  - Note that Quartz Jobs are throwaway objects, in contrast to shared TimerTasks.
+  -->
+<beans>
+
+	<!-- Quartz Scheduler, with pre-registered triggers -->
+	<!-- Will automatically start scheduling on context startup -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref local="runRulesTrigger"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- ******************************************************************* -->
+	<!-- NOTE: refer to Javadoc if persistent triggers are required          -->
+	<!--       The classes used below will not work for persistent triggers  -->
+	<!-- ******************************************************************* -->
+	
+	<!-- Job definition that delegates to the specified 'imageDatabase' method -->
+	<!-- Convenient way of invoking existing business logic instead of writing a job -->
+	<bean id="runRulesBatchJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="runRulesBean"/>
+		<property name="targetMethod" value="run"/>
+	</bean>
+
+	<!-- Trigger for the job defined above -->
+	<!-- Registered by the 'scheduler' bean -->
+	<bean id="runRulesTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="runRulesBatchJobDetail"/>
+		<!-- Run at 5:15AM every day of the week -->
+<!-- 		<property name="cronExpression" value="0 0 4 * * ?"/> -->
+<!--		<property name="cronExpression" value="0 50 15 * * ?"/>-->
+		<property name="cronExpression" value="0 0/1 * * * ?"/>
+	</bean>
+
+	<!-- Another possibility is to use the following
+		* Job - org.springframework.scheduling.quartz.JobDetailBean
+		* Trigger - org.springframework.scheduling.quartz.SimpleTriggerBean	</bean>
+	-->
+
+</beans>

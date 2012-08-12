@@ -1,0 +1,64 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+ 
+   <bean id="sendEmailTask" class="nirmal.singh.spring.quartz.task.SendEmailTask" />
+   <bean name="jobDetailBean" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="nirmal.singh.spring.quartz.job.RunJobSendEmailTask" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="sendEmailTask" value-ref="sendEmailTask" />
+			</map>
+		</property>
+	</bean>
+ 
+<!--
+<bean id="runMeJob" 
+ class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	<property name="targetObject" ref="runMeTask" />
+	<property name="targetMethod" value="printMe" />
+</bean>
+-->
+
+<bean id="runRulesBatchJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="sendEmailTask"/>
+		<property name="targetMethod" value="runTheJob"/>
+	</bean>
+	
+	
+ 
+	<!-- Simple Trigger -->
+<!--	<bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">-->
+<!--		<property name="jobDetail" ref="jobDetailBean" />-->
+<!--		<property name="repeatInterval" value="5000" />-->
+<!--		<property name="startDelay" value="1000" />-->
+<!--	</bean>-->
+ 
+	<!-- Cron Trigger -->
+	<bean id="cronTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="runRulesBatchJobDetail" />
+<!--		<property name="cronExpression" value="0/5 * * * * ?" />--> <!-- Fire every 5 seconds -->
+<!--		<property name="cronExpression" value="0 09 14 * * ?" />-->
+<!--		<property name="cronExpression" value="0 54-59 12 * * ?" /> Fire every minute starting at 2:00 PM and ending at 2:06 PM, every day-->
+		<property name="cronExpression" value="0 0/5 15 * * ?" /> <!--Fire every 5 minutes starting at 3:00 PM and ending at 3:56 PM, every day-->
+<!--		<property name="cronExpression" value="0/20 * * * * ?" />-->
+	</bean>
+ 
+
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="jobDetails">
+			<list>
+			<ref bean="jobDetailBean" />
+			</list>
+		</property>
+		<property name="triggers">
+			<list>
+<!--			<ref bean="simpleTrigger" />-->
+<ref bean="cronTrigger" />
+			</list>
+		</property>
+	</bean>
+ 
+</beans>
